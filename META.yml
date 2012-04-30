@@ -14,9 +14,8 @@ build_requires:
   Test::File: 1.33
   Test::More: 0
 configure_requires:
-  Module::Build: 0.38
-dynamic_config: 1
-generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110930'
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,7 +24,7 @@ name: File-CleanupTask
 provides:
   File::CleanupTask:
     file: lib/File/CleanupTask.pm
-    version: 0.01
+    version: 0.02
 requires:
   Config::Simple: 0
   File::Basename: 0
@@ -40,4 +39,4 @@ requires:
   perl: 5.006
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.01
+version: 0.02

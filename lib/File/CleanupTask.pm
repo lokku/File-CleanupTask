@@ -22,11 +22,11 @@ File::CleanupTask - Delete/Backup files on a task-based configuration
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 
 =head1 SYNOPSIS

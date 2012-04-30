@@ -3,3 +3,6 @@ Revision history for File-CleanupTask
 0.01    Fri Apr 27 11:14:27 BST 2012
         * backup/delete functionality
         * tests
+
+0.02    Mon Apr 30 08:41:03 BST 2012
+        * removed ._CleanupTask.pm, which caused some tests to fail on CPAN
