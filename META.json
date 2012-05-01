@@ -4,7 +4,7 @@
       "Savio Dimatteo <savio@lokku.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110930",
+   "generated_by" : "Module::Build version 0.4, CPAN::Meta::Converter version 2.112150",
    "license" : [
       "perl_5"
    ],
@@ -16,35 +16,38 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Config::Simple" : 0,
-            "Cwd" : 0,
-            "File::Basename" : 0,
-            "File::Find::Rule" : 0,
-            "File::Path" : 0,
-            "File::Spec" : 0,
-            "File::Temp" : 0,
-            "File::Touch" : 0,
+            "Config::Simple" : "4.58",
+            "Cwd" : "3.29",
+            "File::Basename" : "2.76",
+            "File::Find::Rule" : "0.33",
+            "File::Path" : "2.07",
+            "File::Spec" : "3.29",
+            "File::Temp" : "0.2",
+            "File::Touch" : "0.08",
+            "Test::CheckManifest" : "0.9",
             "Test::File" : "1.33",
-            "Test::More" : 0
+            "Test::More" : "0.98",
+            "Test::Pod" : "1.22",
+            "Test::Pod::Coverage" : "1.08"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.38"
+            "Module::Build" : "0.4"
          }
       },
       "runtime" : {
          "requires" : {
-            "Config::Simple" : 0,
-            "File::Basename" : 0,
-            "File::Copy" : 0,
-            "File::Find" : 0,
-            "File::Path" : 0,
-            "File::Spec" : 0,
-            "File::Which" : 0,
-            "Getopt::Long" : 0,
-            "IPC::Run3" : 0,
-            "Sort::Key" : 0,
+            "Config::Simple" : "4.58",
+            "File::Basename" : "2.76",
+            "File::Copy" : "2.11",
+            "File::Find" : "1.12",
+            "File::Path" : "2.07",
+            "File::Spec" : "3.29",
+            "File::Which" : "1.09",
+            "Getopt::Long" : "2.37",
+            "IPC::Run3" : "0.045",
+            "Sort::Key" : "1.28",
             "perl" : "5.006"
          }
       }
@@ -52,7 +55,7 @@
    "provides" : {
       "File::CleanupTask" : {
          "file" : "lib/File/CleanupTask.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -61,5 +64,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.02"
+   "version" : "0.03"
 }

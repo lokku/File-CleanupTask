@@ -22,11 +22,11 @@ File::CleanupTask - Delete/Backup files on a task-based configuration
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 
 =head1 SYNOPSIS
@@ -1061,7 +1061,11 @@ sub _plan_add_action {
     my $self      = shift;
     my $ra_plan   = shift;
     my $rh_action = shift;
-    my $add_to_top= shift // 0;
+    my $add_to_top= shift;
+
+    # perl 5.8.9 compatibility
+    $add_to_top = defined $add_to_top ? $add_to_top
+                                      : 0;
 
     if ($add_to_top) {
         unshift (@$ra_plan, 

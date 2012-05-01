@@ -6,3 +6,7 @@ Revision history for File-CleanupTask
 
 0.02    Mon Apr 30 08:41:03 BST 2012
         * removed ._CleanupTask.pm, which caused some tests to fail on CPAN
+
+0.03    Tue May  1 15:45:08 BST 2012
+        * changed code for better compatibility with older versions of perl
+        * specified version numbers in Build.PL

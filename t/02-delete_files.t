@@ -1496,9 +1496,14 @@ sub _subtest_ended {
 ## 
 sub _touch_am_time {
     my $ra_files   = shift;
-    my $time_epoch = shift // time;
-    my $base       = shift // '/';
-    my $is_recursive_touch = shift // 0;
+    my $time_epoch = shift;
+    my $base       = shift;
+    my $is_recursive_touch = shift;
+
+    # Perl 5.8.9 compatibility
+    $is_recursive_touch = defined $is_recursive_touch ? $is_recursive_touch : 0;
+    $time_epoch = defined $time_epoch ? $time_epoch : time;
+    $base       = defined $base       ? $base : "/";
     
     my $toucher = File::Touch->new(
         atime => $time_epoch, # GMT: Mon, 01 Jan 2001 00:00:00 GMT 
@@ -1525,7 +1530,6 @@ sub _touch_am_time {
 		    $volume = '';
 	        }
                 if ( $dir && index($dir, $base) >= 0 ) {
-		    print (" TOUCH $dir\n");
                     $toucher->touch($dir);
                 }
             }
