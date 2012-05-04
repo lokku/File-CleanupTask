@@ -7,7 +7,7 @@ use File::Temp qw/tempdir/;
 use File::Touch qw/touch/;
 use File::Find::Rule qw//;
 use File::Basename qw/dirname/;
-use File::Path  qw/make_path/;
+use File::Path  qw/mkpath/;
 use File::Spec qw/catpath/;
 
 use_ok('File::CleanupTask');
@@ -218,5 +218,5 @@ sub _ensure_path {
         $dir = dirname($filename);
     }
 
-    File::Path::make_path($dir) if $dir;
+    File::Path::mkpath($dir) if $dir;
 }

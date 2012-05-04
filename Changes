@@ -1,12 +1,24 @@
 Revision history for File-CleanupTask
 
-0.01    Fri Apr 27 11:14:27 BST 2012
-        * backup/delete functionality
-        * tests
+0.06    Fri May  4 10:02:09 BST 2012
+        * fixed warnings
+
+0.05    Thu May  3 10:04:18 BST 2012
+        * using File::Path::mkpath/rmtree instead of 
+          File::Path::make_path/remove_tree, as the longer version is not
+          supported in older File::Path (e.g., v2.04)
+
+0.04    Wed May  2 11:30:07 BST 2012
+        * disabled a verbose test that was mixing with the TAP output
+        * relaxed any requirement on package version to test on more platforms
+        
+0.03    Tue May  1 15:45:08 BST 2012
+        * changed code for better compatibility with older versions of perl
+        * specified version numbers in Build.PL
 
 0.02    Mon Apr 30 08:41:03 BST 2012
         * removed ._CleanupTask.pm, which caused some tests to fail on CPAN
 
-0.03    Tue May  1 15:45:08 BST 2012
-        * changed code for better compatibility with older versions of perl
-        * specified version numbers in Build.PL
+0.01    Fri Apr 27 11:14:27 BST 2012
+        * backup/delete functionality
+        * tests

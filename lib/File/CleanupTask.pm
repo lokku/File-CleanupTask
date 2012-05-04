@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Cwd            qw/realpath getcwd chdir/;
-use File::Path     qw/rmtree/;
+use File::Path     qw/mkpath rmtree/;
 use File::Basename qw/fileparse/;
 use File::Spec     qw/catpath splitpath/;
 use Config::Simple;
@@ -22,11 +22,11 @@ File::CleanupTask - Delete/Backup files on a task-based configuration
 
 =head1 VERSION
 
-Version 0.03
+Version 0.06
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.06';
 
 
 =head1 SYNOPSIS
@@ -1561,7 +1561,7 @@ sub _info {
 }
 
 sub _warn {
-    my $self;
+    my $self    = shift;
     my $message = shift;
     warn " [WARN] $message";
 }

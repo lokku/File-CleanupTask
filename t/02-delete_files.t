@@ -6,7 +6,7 @@ use Test::File qw/file_not_exists_ok/;
 use Config::Simple qw//;
 use Cwd qw/abs_path/;
 use File::Spec  qw/catpath splitpath splitdir/;
-use File::Path  qw/remove_tree make_path/;
+use File::Path  qw/rmtree mkpath/;
 use File::Temp  qw/tempdir/;
 use File::Touch qw//;
 use File::Find::Rule qw//;
@@ -53,7 +53,6 @@ use_ok('File::CleanupTask');
         {
             'conf'     => $task_file,   
             'taskname' => $task_name,
-	    'verbose'  => 1,
         }
     );
     
@@ -1488,7 +1487,7 @@ use_ok('File::CleanupTask');
 done_testing();
 
 sub _subtest_ended {
-    File::Path::remove_tree($test_root);
+    File::Path::rmtree($test_root);
 }
 
 ## Modify access and modification time of the specified files and directories.
@@ -1513,10 +1512,10 @@ sub _touch_am_time {
     foreach my $file (@$ra_files) {
 
         my ($volume,$dir_to_touch,$file_to_touch) = 
-		File::Spec->splitpath($file);
+        File::Spec->splitpath($file);
 
         # Create Dir & Touch file in it
-        File::Path::make_path($dir_to_touch) if $dir_to_touch;
+        File::Path::mkpath($dir_to_touch) if $dir_to_touch;
         $toucher->touch($file) if (defined($file_to_touch));
 
         # Touch all parts if recursive
@@ -1524,14 +1523,14 @@ sub _touch_am_time {
 
 
             my $dir = '';
-	    foreach my $part ( File::Spec->splitdir($dir_to_touch)) {
-		if ($part) {
-		    $dir = File::Spec->catpath($volume, $dir, $part);
-		    $volume = '';
-	        }
-                if ( $dir && index($dir, $base) >= 0 ) {
-                    $toucher->touch($dir);
-                }
+        foreach my $part ( File::Spec->splitdir($dir_to_touch)) {
+        if ($part) {
+            $dir = File::Spec->catpath($volume, $dir, $part);
+            $volume = '';
+        }
+        if ( $dir && index($dir, $base) >= 0 ) {
+            $toucher->touch($dir);
+        }
             }
 
 
@@ -1572,7 +1571,7 @@ sub _make_symlinks {
         else {
             # Make a broken symlink
             _touch_am_time( [$rh_param->{target}] );
-	    symlink($rh_param->{target}, $rh_param->{symlink});
+            symlink($rh_param->{target}, $rh_param->{symlink});
             unlink($rh_param->{target});
         }
 
