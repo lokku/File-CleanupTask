@@ -55,7 +55,7 @@
    "provides" : {
       "File::CleanupTask" : {
          "file" : "lib/File/CleanupTask.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
@@ -64,5 +64,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.06"
+   "version" : "0.07"
 }

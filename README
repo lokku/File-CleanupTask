@@ -1,7 +1,7 @@
 File-CleanupTask
 
 
-This archive contains the distribution File-CleanupTask, version 0.06:
+This archive contains the distribution File-CleanupTask, version 0.07:
 
     File::CleanupTask provides methods to Delete/Backup files on a task-based
     configuration. This module makes it easy to handle pre-scheduled, automatic,

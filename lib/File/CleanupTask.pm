@@ -22,11 +22,11 @@ File::CleanupTask - Delete/Backup files on a task-based configuration
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 
 =head1 SYNOPSIS
@@ -671,7 +671,7 @@ sub _path_check {
     my $self = shift;
     my $path = shift;
 
-    if (!$path) { $self->_warn("No path given"); return; }
+    if (!$path) { $self->_info("No path given to _path_check()"); return; }
 
     if (-l $path) {
         ##
@@ -1435,22 +1435,50 @@ sub _refine_plan {
     return \@final_plan;
 }
 
-=head2     
+=head2
 
-Get the parent path of a given path. This method does not access to the disk to
-determine the parent of the given pathname.
+Get the parent path of a given path. This method only accesses the disk if the
+f_path is found to have no parent directory (i.e., just the relative file name
+has been specified).  In this case, we check that the current working directory
+contains the given file. If yes, we return the current working directory as the
+parent of the specified file. If not, we return undef.
 
 =cut
 sub _parent_path {
     my $self   = shift;
     my $f_path = shift;
 
-    my ($volume,$directories,$file) = File::Spec->splitpath( $f_path );
+    if (!$f_path) {
+        $self->_warn("No path was given to _parent_path()");
+        return undef;
+    }
+
+    my ($volume, $directories, $file) = File::Spec->splitpath($f_path);
+
+    ##
+    ## Try to reconstruct the full pathname of the parent of a relative $f_path
+    ##
+    if (!$directories) {
+        my $cwd = Cwd->getcwd();
+        if (-e File::Spec->catpath($volume, $cwd, $file)) {
+            $self->_info("Returning $cwd as the parent path for $file");
+            return $cwd;
+        }
+        else {
+            $self->_warn("The relative pathname $f_path was given to"
+                . "_parent_path(), but such target doesn't exist in the current"
+                . "working directory ($cwd)."
+            );
+            return undef;
+        }
+    }
+
     my $f_parent = File::Spec->catpath($volume, $directories, '');
     $f_parent =~ s#/$##g;
 
     return $f_parent;
 }
+
 
 =head2 _postprocess_link
 
