@@ -231,8 +231,13 @@ sub command_line_run {
 
         'dryrun',             
         'verbose',
+        'help',
       )
       || $class->_usage_and_exit();
+
+    if ( $rh_params->{help} ) {
+        $class->_usage_and_exit();
+    }
 
     if ( !$rh_params->{conf} ) {
         $class->_usage_and_exit('Parameter --conf required');
@@ -1599,14 +1604,19 @@ sub _usage_and_exit {
     my $message = shift;
 
     print <<"END";
-    $0
+$0
     required:
-        --conf      (from conf/ops/cleanup-tasks/)
-        --taskname  (a task from within the tasks file)
+        --conf      a tasks configuration file
+        --taskname  a task from within the tasks file
         
     optional:
-        --verbose   (make some noise!)
         --dryrun    output plan and then exit
+        --verbose   make some noise!
+        --help      show this message
+
+For more information and documentation for how to write task config files see
+'perldoc File::CleanupTask'.
+
 END
     if ($message) {
         die( $message . "\n" );
