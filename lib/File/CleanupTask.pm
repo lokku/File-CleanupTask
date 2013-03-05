@@ -1197,7 +1197,7 @@ sub _execute_plan {
                 else {
                     $self->_info("mv $from to $to_file");
                     if (!move( $from, $to_file ) ){
-                        $self->_warn("Unable to move. Dieing...");
+                        $self->_warn("Unable to move. Dying...");
                         die sprintf("Unable to move $from to $to_file: %s", $!);
                     }
                 }
