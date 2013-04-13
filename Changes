@@ -1,5 +1,11 @@
 Revision history for File-CleanupTask
 
+0.09    Sat Apr 13 16:04:40 BST 2013 
+        * fixed a typos in debug output
+        * fixed some pod
+        * updated copyright in LICENSE
+        * tests to not throw an exception when File::Temp 0.23 is used
+
 0.08    Mon Aug  6 21:23:44 BST 2012
         * added run-file-cleanuptask binary
         * improved --help usage message

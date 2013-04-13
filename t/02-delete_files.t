@@ -7,7 +7,7 @@ use Config::Simple qw//;
 use Cwd qw/abs_path/;
 use File::Spec  qw/catpath splitpath splitdir/;
 use File::Path  qw/rmtree mkpath/;
-use File::Temp  qw/tempdir/;
+use File::Temp  qw/tempdir tempfile/;
 use File::Touch qw//;
 use File::Find::Rule qw//;
 
@@ -15,7 +15,7 @@ use File::Find::Rule qw//;
 ## Test Setup - Create a .task file for this test that points to a temporary
 ##              test root, then load the task file.
 ##
-my $test_root = File::Temp->tempdir("file_cleanup_test_XXXXX", CLEANUP => 1);
+my $test_root = tempdir("file_cleanup_test_XXXXX", CLEANUP => 1, TMPDIR => 1);
 my $task_file = _create_task_file($test_root);
 
 my $Config = Config::Simple->new(syntax=>'ini');
@@ -132,7 +132,7 @@ use_ok('File::CleanupTask');
             \@dirs_after_cleanup,
             \@expected, 
             'TEST A - Releases scenario'
-        );
+        ) or diag(_dump_arrays(\@dirs_after_cleanup, \@expected));
     }
 
     _subtest_ended();
@@ -1672,6 +1672,22 @@ sub _make_structure {
     return @all_files;
 }
 
+=head2 _dump_arrays
+
+Simple helper to dump content of arrayrefs
+
+=cut
+
+sub _dump_arrays {
+    my ($ra_got, $ra_expected) = @_;
+    my $i = 0;
+    my $j = 0;
+    return sprintf("Got:\n %s \n Expected:\n %s",
+         join("\n", map {$i++ ."] $_"} @$ra_got),
+         join("\n", map {$j++ ."] $_"} @$ra_expected)
+    );
+}
+
 =head2 _create_task_file
 
 Creates a new task file for this test using $testdir_path as a base directory in
@@ -1816,7 +1832,7 @@ sub _create_task_file {
     pattern                 = /locations_cache_si_[0-9]{4}_/
 EOF
 
-    my ($fh, $taskfile_path) = File::Temp->tempfile("taskfile_XXXX");
+    my ($fh, $taskfile_path) = tempfile("taskfile_XXXX", TMPDIR=>1, CLEANUP=>1);
     print $fh $config_content;
     close($fh);
 
