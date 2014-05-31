@@ -15,8 +15,7 @@ use_ok('File::CleanupTask');
 my $Cleanup = File::CleanupTask->new();
 ok($Cleanup, 'created File::CleanupTask instance');
 
-my $temp_dir = tempdir(TMPDIR => 1, CLEANUP => 1);
-
+my $temp_dir = tempdir("file_cleanup_test_XXXXX", CLEANUP => 1);
 
 my $rah_tests = [
     {
@@ -136,7 +135,7 @@ sub create_test_files {
     my $ra_filenames = shift;
     
     my $temp_dir = tempdir( 
-        TEMPLATE => 'ops_cleanup_backup_t_XXXX',
+        TEMPLATE => 'ops_cleanup_backup_t_XXXXX',
         DIR => $temp_dir, 
         CLEANUP => 1
     );
