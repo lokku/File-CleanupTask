@@ -18,7 +18,7 @@ use Sort::Key      qw/nkeysort/;
 
 =head1 NAME
 
-File::CleanupTask - Delete/Backup files on a task-based configuration
+File::CleanupTask - Delete or back up files using a task-based configuration
 
 =head1 VERSION
 
@@ -71,10 +71,10 @@ The following options can be specified under a task label:
 
 =head3 path
 
-The path to the directory containing the files to be deleted or removed. Note
-that in MS Windows the backslashes of a path names should be escaped and
-apostrophese are strictly needed when specifying a path name (see example
-above).
+The path to the directory containing the files to be deleted or removed.
+
+Note that for MS Windows the backslashes in a path should be escaped and single
+quotes are strictly needed when specifying a path name (see the example above).
 
 =head3 backup_path
 
@@ -121,24 +121,27 @@ be deleted.
 If set to 0, only files within "path" can be deleted/backed up.
 If set to 1, files located at any level within "path" can be deleted.
 
+By default, this takes the 0 value.
+
 =head3 prune_empty_directories
 
-If set to 1, empty directories will be deleted regardless their age.
+If set to 1, empty directories will be deleted regardless of their age. By
+default, this takes the 0 value.
 
 =head3 keep_if_linked_in
 
 A pathname to a directory that may contain symlinks. If specified, it will
 prevent deletion of files and directories within path that are symlinked in
-this directory, regardless their age.
+this directory, regardless of their age.
 
 This option will be ignored in MS Windows or in other operating systems that
 don't support symlinks.
 
 =head3 do_not_delete
 
-A regular expression that defines a pattern to look for. Any pathname matching
-this pattern will not be erased, regardless their age. The regular expression
-applies to the full pathname of the file or directory.
+A regular expression that defines a pattern to look for. Any pathnames matching
+this pattern will not be erased, regardless of their age. The regular
+expression applies to the full pathname of the file or directory.
 
 =cut
 
@@ -202,7 +205,7 @@ sub new {
 =head2 command_line_run
 
 Given the arguments specified in the command line, processes them,
-creates a new File::CleanupTask object, an then calls C<run>.
+creates a new File::CleanupTask object, and then calls C<run>.
 
 Options include I<dryrun>, I<verbose>, I<task> and I<conf>.
 
