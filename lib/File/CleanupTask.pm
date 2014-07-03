@@ -179,13 +179,14 @@ don't support symlinks.
 Create and configure a new File::CleanupTask object.
 
 The object must be initialised as follows:
-    
+
     my $cleanup = File::Cleanup->new({
         conf => "/path/to/tasks_file.tasks",
         taskname => 'TASK_LABEL_IN_TASKFILE',
     });
 
 =cut
+
 sub new {
     my $class  = shift;
     my $params = shift;
@@ -223,6 +224,7 @@ Options include I<dryrun>, I<verbose>, I<task> and I<conf>.
 =back
 
 =cut
+
 sub command_line_run {
     my $class     = shift;
     my $rh_params = {};
@@ -261,6 +263,7 @@ sub command_line_run {
 Perform the cleanup
 
 =cut
+
 sub run {
 
     my $can_symlink = eval { symlink("",""); 1 };
@@ -377,6 +380,7 @@ file is encountered a target action is performed based on the state of that file
 (file or directory, symlinked, old, empty directory...).
 
 =cut
+
 sub run_one_task {
     my $self = shift;
     my $rh_task_config = shift;
@@ -505,15 +509,16 @@ sub run_one_task {
 Accessors that will tell you if running in dryrun or verbose mode.
 
 =cut
+
 sub verbose { return $_[0]->{params}{verbose}; }
 sub dryrun  { return $_[0]->{params}{dryrun}; }
 
-=head2 _build_delete_once_empty
-
+=for _build_delete_once_empty
 Builds a delete_once_empty of pathnames, each of which should be deleted only if
 all its files are also deleted.
 
 =cut
+
 sub _build_delete_once_empty {
     my $self         = shift;
     my $rh_paths     = shift;
@@ -534,12 +539,12 @@ sub _build_delete_once_empty {
     return $rh_delete_once_empty;
 }
 
-=head2 _build_never_delete
-
+=for _build_never_delete
 Builds a never_delete list of pathnames that shouldn't be deleted at any
 condition.
 
 =cut
+
 sub _build_never_delete {
     my $self         = shift;
     my $rh_paths     = shift;
@@ -596,11 +601,11 @@ sub _build_never_delete {
     return $rh_never_delete;
 }
 
-=head2 _never_delete_add_path
-
+=for _never_delete_add_path
 Adds a path to the given never_delete list.
 
 =cut
+
 sub _never_delete_add_path {
     my $self         = shift;
     my $rh_never_delete = shift;
@@ -620,11 +625,11 @@ sub _never_delete_add_path {
     return;
 }
 
-=head2 _delete_once_empty_contains
-
+=for _delete_once_empty_contains
 Checks if the given path is contained in the delete_once_empty
 
 =cut
+
 sub _delete_once_empty_contains {
     my $self         = shift;
     my $rh_delete_once_empty = shift;
@@ -635,11 +640,11 @@ sub _delete_once_empty_contains {
     return 0;
 }
 
-=head2 _delete_once_empty_add_path
-
+=for _delete_once_empty_add_path
 Adds a path to the given delete_once_empty.
 
 =cut
+
 sub _delete_once_empty_add_path {
     my $self = shift;
     my $rh_delete_once_empty = shift;
@@ -657,11 +662,11 @@ sub _delete_once_empty_add_path {
     }
 }
 
-=head2 _never_delete_contains
-
+=for _never_delete_contains
 Checks if the given path is contained in the never_delete.
 
 =cut
+
 sub _never_delete_contains {
     my $self         = shift;
     my $rh_never_delete = shift;
@@ -671,11 +676,11 @@ sub _never_delete_contains {
     return 0;
 }
 
-=head2 _path_check
-
+=for _path_check
 Checks up the given path, and returns its absolute representation.
 
 =cut
+
 sub _path_check {
     my $self = shift;
     my $path = shift;
@@ -697,7 +702,7 @@ sub _path_check {
                       : File::Spec->canonpath($path);
 }
 
-=head2 _build_plan
+=begin _build_plan
 
 Plans the actions to be executed on the files in the target path according to:
 
@@ -707,7 +712,10 @@ Plans the actions to be executed on the files in the target path according to:
 
 All files in the never_delete list can't be deleted.
 
+=end _build_plan
+
 =cut
+
 sub _build_plan {
     my $self      = shift;
     my $rh_params = shift;
@@ -936,7 +944,7 @@ sub _build_plan {
    );
 }
 
-=head2 _plan_add_actions
+=begin _plan_add_actions
 
 Given a path to a file and the task configuration options, augment the plan
 with actions to take on that file.
@@ -958,7 +966,10 @@ Resulting actions are decided according to one or more of the followings:
 This method works under the assumption that the specified file or directory
 exists and the user has full permissions on it.
 
+=end _plan_add_actions
+
 =cut
+
 sub _plan_add_actions {
     my $self      = shift;
     my $ra_plan   = shift;
@@ -1061,11 +1072,11 @@ sub _plan_add_actions {
     return \@actions;
 }
 
-=head2 _plan_add_action
-
+=for _plan_add_action
 Adds the given action to the plan.
 
 =cut
+
 sub _plan_add_action {
     my $self      = shift;
     my $ra_plan   = shift;
@@ -1094,11 +1105,11 @@ sub _plan_add_action {
     }
 }
 
-=head2 _is_folder_empty
-
+=for _is_folder_empty
 Returns 1 if the given folder is empty.
 
 =cut
+
 sub _is_folder_empty { 
     my $self    = shift;
     my $dirname = shift; 
@@ -1106,12 +1117,12 @@ sub _is_folder_empty {
     return scalar(grep { $_ ne "." && $_ ne ".." } readdir($dh)) == 0; 
 }
 
-=head2 _execute_plan
-
+=for _execute_plan
 Execute a plan based on the given task options. Blacklist is passed to make
 sure once again that no unwanted files or directories are deleted.
 
 =cut
+
 sub _execute_plan {
     my $self      = shift;
     my $rh_params = shift;
@@ -1229,7 +1240,7 @@ sub _ensure_path {
     return 1;
 } 
 
-=head2 _refine_plan
+=begin _refine_plan
 
 Takes into account symlinks in the current plan.
 
@@ -1257,7 +1268,10 @@ The refinement is done in the following way:
 
 Return the refined plan.
 
+=end _refine_plan
+
 =cut
+
 sub _refine_plan {
     my $self        = shift;
     my $ra_plan     = shift;
@@ -1444,8 +1458,7 @@ sub _refine_plan {
     return \@final_plan;
 }
 
-=head2
-
+=for _parent_path
 Get the parent path of a given path. This method only accesses the disk if the
 f_path is found to have no parent directory (i.e., just the relative file name
 has been specified).  In this case, we check that the current working directory
@@ -1453,6 +1466,7 @@ contains the given file. If yes, we return the current working directory as the
 parent of the specified file. If not, we return undef.
 
 =cut
+
 sub _parent_path {
     my $self   = shift;
     my $f_path = shift;
@@ -1489,7 +1503,7 @@ sub _parent_path {
 }
 
 
-=head2 _postprocess_link
+=begin _postprocess_link
 
 Given a path to a symlink and a hash reference, keep the symlink target as a
 key of the hash reference (canonical path), and the path to the symlink (non
@@ -1499,7 +1513,10 @@ the same target, the value of this hashref is an arrayref of symlinks paths.
 Returns true on success, or false if a path to something else than a symlink is
 passed to this method.
 
+=end _postprocess_link
+
 =cut
+
 sub _postprocess_link {
     my $self        = shift;
     my $rh_symlinks = shift;
@@ -1519,7 +1536,7 @@ sub _postprocess_link {
     return 0;
 }
 
-=head2 _fix_pattern
+=begin _fix_pattern
 
 Refine a pattern passed from the configuration.
 
@@ -1527,7 +1544,10 @@ Currently applyes the following transformation:
     - Remove any "/" in case the user has specified a pattern in the form of
       /pattern/.
 
+=end _fix_pattern
+
 =cut
+
 sub _fix_pattern {
     my $self    = shift;
     my $pattern = shift;
