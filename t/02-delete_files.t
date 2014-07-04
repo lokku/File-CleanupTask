@@ -10,6 +10,7 @@ use File::Path  qw/rmtree mkpath/;
 use File::Temp  qw/tempdir tempfile/;
 use File::Touch qw//;
 use File::Find::Rule qw//;
+use File::Find qw//;
 
 ##
 ## Test Setup - Create a .task file for this test that points to a temporary
@@ -365,7 +366,7 @@ use_ok('File::CleanupTask');
 
 
 ##
-## TEST E - Directories are pruned correctly (non-recursive mode)
+## TEST E - Directories are pruned correctly (non-recursive mode, max_days=0)
 ##
 {
     my $cleanup = File::CleanupTask->new({
@@ -380,6 +381,7 @@ use_ok('File::CleanupTask');
         /foo/2/c.txt [new]
         /foo/3/ [new]
         /fie [new]
+        /xfoobar/ [newR]
     )]);
     
     $cleanup->run();
@@ -399,14 +401,57 @@ use_ok('File::CleanupTask');
     is_deeply(
         \@dirs_after_cleanup, 
         \@expected, 
-        'TEST E - Test prune_empty_directories works correctly (non-recursive)'
-    );
+        'TEST E - Test prune_empty_directories works correctly (non-recursive, max_days=0)'
+    ) or diag(_dump_arrays(\@dirs_after_cleanup, \@expected));
     
     _subtest_ended();
 }
 
 ##
-## TEST F - Directories are pruned correctly (recursive mode)
+## TEST E1 - Directories are pruned correctly (non-recursive mode, max_days=7)
+##
+{
+    my $cleanup = File::CleanupTask->new({
+        conf     => $task_file,
+        taskname => 'TEST_E1'
+    });
+    _make_structure($test_root, [qw(
+        /empty/a/1/2/ [new]
+        /empty/b/1/2/4/5/6/ [new]
+        /foo/1/a.txt [new]
+        /foo/2/b.txt [new]
+        /foo/2/c.txt [new]
+        /foo/3/ [new]
+        /fie [new]
+        /bla [old]
+    )]);
+    
+    $cleanup->run();
+    
+    my @dirs_after_cleanup = sort File::Find::Rule->in( $test_root );
+    
+    ## - - - Moment of truth - - -
+    my @expected = _make_expected_list($test_root, [qw(
+        /empty/a/1/2/
+        /empty/b/1/2/4/5/6/
+        /foo/1/a.txt
+        /foo/2/b.txt
+        /foo/2/c.txt
+        /foo/3/
+        /fie
+    )]);
+
+    is_deeply(
+        \@dirs_after_cleanup, 
+        \@expected, 
+        'TEST E1 - Test prune_empty_directories works correctly (non-recursive, max_days=7)'
+    ) or diag(_dump_arrays(\@dirs_after_cleanup, \@expected));
+    
+    _subtest_ended();
+}
+
+##
+## TEST F - Directories are pruned correctly (recursive mode, max_days=0)
 ##
 {
     my $cleanup = File::CleanupTask->new({
@@ -437,8 +482,53 @@ use_ok('File::CleanupTask');
     is_deeply(
         \@dirs_after_cleanup,
         \@expected, 
-        'TEST F - Test prune_empty_directories works correctly (recursive)'
+        'TEST F - Test prune_empty_directories works correctly (recursive, max_days=0)'
     );
+
+    _subtest_ended();
+}
+
+##
+## TEST F1 - Directories are pruned correctly (recursive mode, max_days=7)
+##
+{
+    my $cleanup = File::CleanupTask->new({
+        conf     => $task_file,
+        taskname => 'TEST_F1',
+    });
+    _make_structure($test_root, [qw(
+        /empty/a/1/2/ [new]
+        /empty/b/1/2/4/5/6/ [new]
+        /empty/c/1/2 [old]
+        /empty/d/    [oldR]
+        /foo/1/a.txt [new]
+        /foo/2/b.txt [new] 
+        /foo/2/c.txt [new]
+        /foo/3/      [new]
+        /fie         [new]
+        /bla         [old]
+    )]);
+    
+    $cleanup->run();
+    
+    my @dirs_after_cleanup = sort File::Find::Rule->in( $test_root );
+    
+    ## - - - Moment of truth - - -
+    my @expected = _make_expected_list($test_root, [qw(
+        /empty/a/1/2/
+        /empty/b/1/2/4/5/6/
+        /foo/1/a.txt
+        /foo/2/b.txt
+        /foo/2/c.txt
+        /foo/3/
+        /fie
+    )]);
+
+    is_deeply(
+        \@dirs_after_cleanup,
+        \@expected, 
+        'TEST F1 - Test prune_empty_directories works correctly (recursive, max_days=7)'
+    ) or diag(_dump_arrays(\@dirs_after_cleanup, \@expected));
 
     _subtest_ended();
 }
@@ -1670,6 +1760,32 @@ sub _make_structure {
         );
     }
 
+    # The code also looks at the mtime of directories when
+    # prune_empty_directories is 1. To keep things simple, we'll make sure that
+    # each directory's mtime is equal to the most recent mtime of its children
+
+    File::Find::finddepth(sub {
+        return if ! -d $_;
+        my $greatest_epoch = undef;
+        opendir my $dh, $_ or die;
+        while (my $f = readdir($dh)) {
+            next if $f eq '.' || $f eq '..';
+            my $mtime = (stat($_ . "/" . $f))[9];
+            if (! defined($greatest_epoch) || $greatest_epoch < $mtime) {
+                $greatest_epoch = $mtime;
+            }
+        }
+        closedir $dh or die;
+        if ($greatest_epoch) {
+            my $toucher = File::Touch->new(
+                atime => $greatest_epoch,
+                mtime => $greatest_epoch,
+            );
+            $toucher->touch($_);
+        }
+        return;
+    }, $base_dir);
+
     return @all_files;
 }
 
@@ -1737,8 +1853,23 @@ sub _create_task_file {
     recursive               = 0
     do_not_delete           = '.*[.]txt\$'
 
+[TEST_E1]
+    max_days                = 7
+    path                    = \'$testdir_path\'
+    prune_empty_directories = 1
+    recursive               = 0
+    do_not_delete           = '.*[.]txt\$'
+
 [TEST_F]
     max_days                = 0
+    path                    = \'$testdir_path\'
+    prune_empty_directories = 1
+    recursive               = 1
+    do_not_delete           = '.*[.]txt\$'
+    enable_symlinks_integrity_in_path = 1
+
+[TEST_F1]
+    max_days                = 7
     path                    = \'$testdir_path\'
     prune_empty_directories = 1
     recursive               = 1

@@ -121,12 +121,17 @@ be deleted.
 If set to 0, only files within "path" can be deleted/backed up.
 If set to 1, files located at any level within "path" can be deleted.
 
+If C<prune_empty_directories> is enabled and C<recursive> is disabled, then
+only empty directories that are direct children of "path" will be cleaned up.
+
 By default, this takes the 0 value.
 
 =head3 prune_empty_directories
 
-If set to 1, empty directories will be deleted regardless of their age. By
-default, this takes the 0 value.
+If set to 1, empty directories will be deleted, respecting the C<max_days>
+option. (In versions 0.09 and older, this would not respect the max_days option.)
+
+By default, this takes the 0 value.
 
 =head3 keep_if_linked_in
 
@@ -832,10 +837,11 @@ sub _build_plan {
                 }
                 else {
                     ##
-                    ## May delete if:
+                    ## May delete if all these conditions are met:
                     ## - prune_empty is on
                     ## - the directory is or will be empty (all files deleted)
                     ## - the directory is not never_deleted
+                    ## - the directory is older than max_days old if specified
                     ##
 
 
@@ -853,18 +859,29 @@ sub _build_plan {
                             = ("nothing", "'do_not_delete' matched");
                     }
                     else {
-                        ##
-                        ## Delete the directory
-                        ##
-                        my $verb = $self->_is_folder_empty($dir) ? 'is' 
-                                                                 : 'will be';
+                        my $d_time = (stat($dir))[9]; # mtime
+                        if (! defined($d_time)) {
+                            ($action, $reason) = ('nothing', "unable to stat");
+                        }
+                        elsif ($self->{keep_above_epoch} &&
+                            $d_time >= $self->{keep_above_epoch}) {
 
-                        ($action, $reason) 
-                            = ('delete', sprintf('%s empty', $verb));
+                            ($action, $reason) = ('nothing', "new directory");
 
-                        $empties{$dir} = 1;
+                        }
+                        else {
+                            ##
+                            ## Delete the directory
+                            ##
+                            my $verb = $self->_is_folder_empty($dir) ? 'is' 
+                                                                    : 'will be';
+
+                            ($action, $reason) 
+                                = ('delete', sprintf('%s empty', $verb));
+
+                            $empties{$dir} = 1;
+                        }
                     }
-
                 }
 
                 ##
@@ -919,7 +936,9 @@ sub _build_plan {
                  if ( -d $f && 
                       $prune_empty && 
                       $self->_is_folder_empty($f) &&
-                      (!$self->_never_delete_contains($rh_never_delete, $f)) ) {
+                      (!$self->_never_delete_contains($rh_never_delete, $f)) &&
+                      (! $self->{keep_above_epoch} || (stat($f))[9] <= $self->{keep_above_epoch})) {
+
 
                         $self->_plan_add_action( \@plan, 
                             { action => 'delete', 
