@@ -1,7 +1,7 @@
 File-CleanupTask
 
 
-This archive contains the distribution File-CleanupTask, version 0.09:
+This archive contains the distribution File-CleanupTask, version 0.10:
 
     File::CleanupTask provides methods to Delete/Backup files on a task-based
     configuration. This module makes it easy to handle pre-scheduled, automatic,
@@ -42,7 +42,7 @@ You can also look for information at:
 
 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2012 by Lokku Ltd..
+This software is copyright (c) 2012-2014 by Lokku Ltd..
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
