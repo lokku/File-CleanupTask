@@ -148,6 +148,10 @@ A regular expression that defines a pattern to look for. Any pathnames matching
 this pattern will not be erased, regardless of their age. The regular
 expression applies to the full pathname of the file or directory.
 
+In the configuration file, it should be surrounded by forward slashes. Because
+the configuration file is parsed by L<Config::Simple>, you will need to escape
+any backslashes in the regex with a backslash.
+
 =cut
 
 =head3 delete_all_or_nothing_in
