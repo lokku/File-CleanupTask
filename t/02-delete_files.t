@@ -326,13 +326,12 @@ use_ok('File::CleanupTask');
         ##                                         top level )
         ## [old] ./foo/gz/b.txt.gz               ( to delete, old + no match )
         ## [old] ./foo/gz/c.txt.gz               ( keep, symlinked! )
-        ## [old] ./foo/txt/a.lnk -> [old] ./foo/gz/a.txt.gz ( delete, old, 
-        ##                                          not at toplevel )
+        ## [new] ./foo/txt/a.lnk -> [old] ./foo/gz/a.txt.gz ( to keep, symlink is new )
         ## [new] ./b.lnk -> [old] ./foo/txt/b.txt  ( keep, a toplevel symlink )
-        ## [old] ./c.lnk -> [old] ./foo/gz/c.txt.gz ( keep, a toplevel symlink
+        ## [new] ./c.lnk -> [old] ./foo/gz/c.txt.gz ( keep, a toplevel symlink
         ##                                           that refers to something
         ##                                           in the cleanup directory )
-        
+
         ## Cleanup
         ##
         $cleanup_test->run();
@@ -344,6 +343,7 @@ use_ok('File::CleanupTask');
         my @expected = _make_expected_list($test_root, [qw(
             /c.lnk
             /b.lnk
+            /foo/txt/a.lnk
             /foo/txt/a.txt
             /foo/txt/b.txt
             /foo/txt/c.txt
@@ -351,7 +351,7 @@ use_ok('File::CleanupTask');
             /empty/1/2
             /bar/1/2/3/4/5/6/7/8/9.txt.gz
         )]);
-        
+
         # Everything worked?
         is_deeply (
             \@dirs_after_cleanup,

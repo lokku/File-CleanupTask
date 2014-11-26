@@ -14,7 +14,7 @@ use File::Find;
 use File::Copy;
 use IPC::Run3      qw/run3/;
 use Sort::Key      qw/nkeysort/;
-
+use Config;
 
 =head1 NAME
 
@@ -22,11 +22,11 @@ File::CleanupTask - Delete or back up files using a task-based configuration
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 
 =head1 SYNOPSIS
@@ -1057,7 +1057,15 @@ sub _plan_add_actions {
                 ## Perform an action on the file (delete/backup) according to
                 ## the given criteria (max_days for now)
                 ##
-                my $f_time = (stat($f))[9];
+
+                ## Make sure we get the time from the symlink rather than the
+                ## linked file (if $f is a symlink)
+                my $f_time;
+                if ($Config{d_lstat} && -l $f) {
+                    $f_time = (lstat($f))[9];
+                } else {
+                    $f_time = (stat($f))[9];
+                }
                 if ( !defined($f_time) ) {
                     ($action, $reason) = ('nothing', "unable to stat");
                 }
